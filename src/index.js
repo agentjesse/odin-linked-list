@@ -184,7 +184,7 @@ linkedList1.append( 'pear' );
 linkedList1.prepend( 'chocolate bar' );
 linkedList1.append( 'cherry' );
 linkedList1.pop();
-// lg( JSON.stringify( linkedList1.getHead(), null, '\t' ) ); //wow!!!
+lg( JSON.stringify( linkedList1.getHead(), null, '\t' ) ); //wow!!!
 lg( `nodes in linked list: ${ linkedList1.getSize() }` );
 // lg( `tail of linked list: ${ JSON.stringify( linkedList1.getTail(), null, '\t' ) }` );
 // lg( `node at index 1 of linked list: ${ JSON.stringify( linkedList1.at(1), null, '\t' ) }` );
