@@ -1,5 +1,5 @@
 /* Next task:
-- insertAt fn need to handle insertions at the head and tail
+-
 */
 /**/
 
@@ -101,22 +101,48 @@ const makeLinkedList = (head = null, tail = null)=> {
     return null; //handle value not found
   };
 
-  // splice a new node with value into list at an index
+  // insert a new node at insertion index
   const insertAt = (value, insertIndex)=> {
     lg( 'value to insert: ' + value );
-    // throw error if the list does not have the indexed space created.
+    // throw error if the list does not have the indexed space created, like
+    // trying to insert to 0 on an empty list, or to an index past the last index.
     if ( insertIndex < 0 || insertIndex >= getSize() ) {
-      //todo: log message to offer using append option when list is empty
-      throw new Error('Index outside list bounds');
+      throw new Error(`Insertion Index not in list bounds. (List empty: ${
+        getSize() === 0 ? 'true' : 'false'
+      })`);
     }
-    // todo: handle node insertions at head and tail
-    
-    //handle insertion at an index within the list that is not head or tail.
+    // handle node insertions at head
+    if ( insertIndex === 0 ) {
+      prepend(value);
+      return;
+    }
+    //handle insertion at index within list after head
     const nextNode = at(insertIndex);
     const previousNode = at(insertIndex - 1);
     //create new node with value and the nextNode
     previousNode.next = makeNode(value, nextNode);
+  };
 
+  // remove node at index
+  const removeAt = (removalIndex)=> {
+    lg( 'index of node to remove: ' + removalIndex );
+    // throw error if the list does not have the indexed space created, like
+    // trying to remove 0 on an empty list, or to an index past the last index.
+    if ( removalIndex < 0 || removalIndex >= getSize() ) {
+      throw new Error(`Removal Index not in list bounds. (List empty: ${
+        getSize() === 0 ? 'true' : 'false'
+      })`);
+    }
+    // handle node removal at head
+    if ( removalIndex === 0 ) {
+      head = head.next;
+      return;
+    }
+    //handle removal at index within list after head
+    const nextNode = at(removalIndex).next;
+    const previousNode = at(removalIndex - 1);
+    //connect nodes together
+    previousNode.next = nextNode;
   };
 
   const toString = ()=> {
@@ -146,7 +172,8 @@ const makeLinkedList = (head = null, tail = null)=> {
     contains,
     findIndex,
     toString,
-    insertAt
+    insertAt,
+    removeAt,
   };
 };
 
@@ -154,9 +181,9 @@ const makeLinkedList = (head = null, tail = null)=> {
 const linkedList1 = makeLinkedList();
 linkedList1.append( 'banana' );
 linkedList1.append( 'pear' );
-// linkedList1.prepend( 'chocolate bar' );
+linkedList1.prepend( 'chocolate bar' );
 linkedList1.append( 'cherry' );
-// linkedList1.pop();
+linkedList1.pop();
 // lg( JSON.stringify( linkedList1.getHead(), null, '\t' ) ); //wow!!!
 lg( `nodes in linked list: ${ linkedList1.getSize() }` );
 // lg( `tail of linked list: ${ JSON.stringify( linkedList1.getTail(), null, '\t' ) }` );
@@ -165,6 +192,7 @@ lg( `nodes in linked list: ${ linkedList1.getSize() }` );
 // lg( `'orange' in list?: ${ linkedList1.contains('orange') }` );
 // lg( `index of 'cherry' in list: ${ linkedList1.findIndex('cherry') }` );
 // lg( `index of 'banana' in list: ${ linkedList1.findIndex('banana') }` );
-
-linkedList1.insertAt('apple', 1);
+// linkedList1.insertAt('apple', 0);
+// linkedList1.insertAt('grape', 3);
+// linkedList1.removeAt(2);
 lg( linkedList1.toString() );
