@@ -10,6 +10,7 @@ import { logToConsole as lg, tableToConsole as tb } from './logger.js'; //shorth
 const makeNode = (value = null, next = null)=> ( { value, next } );
 //linked list creation fn
 const makeLinkedList = (head = null, tail = null)=> {
+  let currentSize = 0; //cache the size to not always recalculate
   //management fns
   //fn to add node to end of list
   const append = (value)=> {
@@ -22,6 +23,7 @@ const makeLinkedList = (head = null, tail = null)=> {
       tail.next = makeNode(value);
       tail = tail.next; //set new tail
     }
+    currentSize++;
   };
 
   //fn to add node at beginning of list
@@ -30,18 +32,22 @@ const makeLinkedList = (head = null, tail = null)=> {
     const newHead = makeNode(value);
     newHead.next = head;
     head = newHead;
+    currentSize++;
   };
 
-  //fn to return amount of nodes in list.
-  const getSize = ()=> {
-    let size = 0;
-    let currentNode = head;
-    while ( currentNode ) { //loop based on existence of next node
-      size++;
-      currentNode = currentNode.next;
-    }
-    return size;
-  };
+  //OLD PRE MEMOIZATION CODE: fn to return amount of nodes in list.
+  // const getSize = ()=> {
+  //   let size = 0;
+  //   let currentNode = head;
+  //   while ( currentNode ) { //loop based on existence of next node
+  //     size++;
+  //     currentNode = currentNode.next;
+  //   }
+  //   return size;
+  // };
+
+  //NEW MEMOIZATION CODE: fn to return amount of nodes in list.
+  const getSize = ()=> currentSize;
 
   //fn to get node from an index
   const at = (index)=> {
@@ -51,7 +57,7 @@ const makeLinkedList = (head = null, tail = null)=> {
     }
     for ( let currentIndex = 0; currentIndex <= index; currentIndex++ ) {
       if ( currentIndex === index) return currentNode;
-      currentNode = currentNode.next; //move to next node..broken
+      currentNode = currentNode.next; //move to next node
     }
   };
 
@@ -65,6 +71,7 @@ const makeLinkedList = (head = null, tail = null)=> {
     //handle popping of last node
     if ( getSize() === 1 ) {
       [head, tail] = [null, null];
+      currentSize--;
       return;
     }
     //since this is not a doubly-linked list, we need to traverse the list to the end
@@ -75,6 +82,7 @@ const makeLinkedList = (head = null, tail = null)=> {
     }
     //once tail is set correctly, pop last node.
     tail.next = null;
+    currentSize--;
   };
 
   //fn to check if a value is in the list
@@ -121,6 +129,7 @@ const makeLinkedList = (head = null, tail = null)=> {
     const previousNode = at(insertIndex - 1);
     //create new node with value and the nextNode
     previousNode.next = makeNode(value, nextNode);
+    currentSize++;
   };
 
   // remove node at index
@@ -136,6 +145,7 @@ const makeLinkedList = (head = null, tail = null)=> {
     // handle node removal at head
     if ( removalIndex === 0 ) {
       head = head.next;
+      currentSize--;
       return;
     }
     //handle removal at index within list after head
@@ -143,6 +153,7 @@ const makeLinkedList = (head = null, tail = null)=> {
     const previousNode = at(removalIndex - 1);
     //connect nodes together
     previousNode.next = nextNode;
+    currentSize--;
   };
 
   const toString = ()=> {
