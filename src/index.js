@@ -1,70 +1,95 @@
 /* Next task:
--  Build a function mergeSort that takes in an array and returns a sorted array,
- using a recursive merge sort methodology. An input of [3,1,4,2] should return [1,2,3,4].
+-
 */
-/* pattern finding chart
-mS([1])   = [1]
-mS([2,1]) = [1,2]
-mS([3,1,4,2]) = mS([3,1]) merged with mS([4,2])
-pattern found: mergesort needs to return a sorted array
-
-example of program flow:
-          [3,1,4,2]    received 2 elem arr, split it..
-        [3,1]   [4,2]  each arr must be sorted..
-        [1,3]   [2,4]  after calling mergesort to sort each array..
-          [1,2,3,4]    merge left and right (using another fn)
+/*
 */
 
 //For Node.js, when importing local modules, include the file extension in the import statement.
 import { logToConsole as lg, tableToConsole as tb } from './logger.js'; //shorthand loggers
 
-const mergeLeftAndRight = ( leftHalf, rightHalf )=> {
-  let leftArrPointer = 0;
-  let rightArrPointer = 0;
-  let resultArr = [];
-  //loop over array elements while their pointers are within the arrays
-  while ( leftArrPointer < leftHalf.length && rightArrPointer < rightHalf.length ) {
-    if ( leftHalf[leftArrPointer] < rightHalf[rightArrPointer] ) {
-      resultArr.push( leftHalf[leftArrPointer] );
-      leftArrPointer++;
-    } else {
-      resultArr.push( rightHalf[rightArrPointer] );
-      rightArrPointer++;
+//node creation fn
+const makeNode = (value = null, next = null)=> ( { value, next } );
+//linked list creation fn
+const makeLinkedList = (head = null, tail = null)=> {
+  let currentHead = null; //for traversal methods
+  //management fns
+  const append = (value)=> {
+    //handle empty list
+    if ( !head ) {
+      head = makeNode(value);
+      tail = head;
     }
-  }
-  // Add any remaining elements from leftHalf arr
-  while (leftArrPointer < leftHalf.length) {
-    resultArr.push(leftHalf[leftArrPointer]);
-    leftArrPointer++;
-  }
-  // Add any remaining elements from rightHalf arr
-  while (rightArrPointer < rightHalf.length) {
-    resultArr.push(rightHalf[rightArrPointer]);
-    rightArrPointer++;
+    //handle non-empty list
+    else {
+      //create new node at tail
+      tail.next = makeNode(value);
+      tail = tail.next; //set new tail
+    }
+  };
+
+  const prepend = (value)=> {
+    //new node at head
+    const newHead = makeNode(value);
+    newHead.next = head;
+    head = newHead;
+  };
+
+  const getSize = ()=> {
+    let size = 0;
+    currentHead = head;
+    while ( currentHead ) {
+      size++;
+      currentHead = currentHead.next;
+    }
+    return size;
+  };
+
+  const at = (index)=> {
+    currentHead = head; //start at head
+    for ( let currentIndex = 0; currentIndex <= index; currentIndex++ ) {
+      if ( currentIndex === index) return currentHead;
+      currentHead = currentHead.next; //move to next node
+    }
+  };
+
+  const pop = ()=> {
+    //since this is not a doubly-linked list, we need to traverse the list to the end
+    currentHead = head;
+    while ( currentHead.next ) {
+      tail = currentHead; //set tail to previous node before changing currentHead
+      currentHead = currentHead.next; //move to next node
+    }
+    //once tail is set correctly, pop last node.
+    tail.next = null;
   }
 
-  return resultArr;
+  const contains = (value)=> {
+    //traverse and search
+    currentHead = head;
+    
+  }
+
+  return {
+    append,
+    prepend,
+    getHead: ()=> head,
+    getTail: ()=> tail,
+    getSize,
+    at,
+    pop,
+    contains,
+  };
 };
 
-//mergeSort needs to return a sorted array so it can be called recursively with sub arrays
-const mergeSort = arr=> {
-  //base case 1: immediately return arrays of one element as they're already sorted
-  if (arr.length === 1) return arr;
-  //otherwise, begin sorting the multi element array by dividing it into halves
-  const midIndex = Math.floor( arr.length / 2 );
-  let leftHalf = arr.slice( 0, midIndex );
-  let rightHalf = arr.slice( midIndex );
-
-  //to sort both halves, we can think of each array as something mergesort can handle.
-  //remember that single element arrs will just return as they are already sorted
-  leftHalf = mergeSort( leftHalf );
-  rightHalf = mergeSort( rightHalf );
-
-  //after getting 2 sorted arrays, we have to merge them
-  return mergeLeftAndRight( leftHalf, rightHalf );
-};
-
-// lg( mergeSort( [2, 1] ) ); //[1,2]
-// lg( mergeSort( [2, 1, 4, 3] ) ); //[1,2,3,4]
-lg( mergeSort( [3, 2, 1, 13, 8, 5, 0, 1] ) ); //[0, 1, 1, 2, 3, 5, 8, 13]
-// lg( mergeSort( [105, 79, 100, 110] ) ); //[79, 100, 105, 110]
+//testing
+const linkedList1 = makeLinkedList();
+linkedList1.append( 'banana' );
+linkedList1.append( 'pear' );
+linkedList1.prepend( 'chocolate bar' );
+linkedList1.append( 'orange' );
+linkedList1.pop();
+lg( JSON.stringify( linkedList1.getHead(), null, '\t' ) ); //wow!!!
+lg( `nodes in linked list: ${ linkedList1.getSize() }` );
+// lg( `tail of linked list: ${ JSON.stringify( linkedList1.getTail(), null, '\t' ) }` );
+// lg( `index 2 node of linked list: ${ JSON.stringify( linkedList1.at(2), null, '\t' ) }` );
+lg( `'pear' in list?: ${ linkedList1.contains('pear') }` );
