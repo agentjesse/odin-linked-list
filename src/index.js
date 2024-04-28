@@ -4,7 +4,7 @@
 /**/
 
 //For Node.js, when importing local modules, include the file extension in the import statement.
-import { logToConsole as lg, tableToConsole as tb } from './logger.js'; //shorthand loggers
+import { logToConsole as lg } from './logger.js'; //shorthand loggers
 
 //node creation fn
 const makeNode = (value = null, next = null)=> ( { value, next } );
@@ -28,10 +28,15 @@ const makeLinkedList = (head = null, tail = null)=> {
 
   //fn to add node at beginning of list
   const prepend = (value)=> {
-    //new node at head
-    const newHead = makeNode(value);
-    newHead.next = head;
-    head = newHead;
+    //handle empty list
+    if ( !head ) {
+      head = makeNode(value);
+      tail = head;
+    } else { //make, set new head node
+      const newHead = makeNode(value);
+      newHead.next = head;
+      head = newHead;
+    }
     currentSize++;
   };
 
@@ -111,7 +116,7 @@ const makeLinkedList = (head = null, tail = null)=> {
 
   // insert a new node at insertion index
   const insertAt = (value, insertIndex)=> {
-    lg( 'value to insert: ' + value );
+    lg( `value to insert: ${value}` );
     // throw error if the list does not have the indexed space created, like
     // trying to insert to 0 on an empty list, or to an index past the last index.
     if ( insertIndex < 0 || insertIndex >= getSize() ) {
@@ -125,16 +130,16 @@ const makeLinkedList = (head = null, tail = null)=> {
       return;
     }
     //handle insertion at index within list after head
-    const nextNode = at(insertIndex);
     const previousNode = at(insertIndex - 1);
+    const nextNode = previousNode.next.next;
     //create new node with value and the nextNode
     previousNode.next = makeNode(value, nextNode);
     currentSize++;
   };
 
-  // remove node at index
+  // remove node at index, return it's value
   const removeAt = (removalIndex)=> {
-    lg( 'index of node to remove: ' + removalIndex );
+    lg( `index of node to remove: ${removalIndex}` );
     // throw error if the list does not have the indexed space created, like
     // trying to remove 0 on an empty list, or to an index past the last index.
     if ( removalIndex < 0 || removalIndex >= getSize() ) {
@@ -142,18 +147,22 @@ const makeLinkedList = (head = null, tail = null)=> {
         getSize() === 0 ? 'true' : 'false'
       })`);
     }
+    let returnVal;
     // handle node removal at head
     if ( removalIndex === 0 ) {
+      returnVal = head.value;
       head = head.next;
       currentSize--;
-      return;
+      return returnVal;
     }
     //handle removal at index within list after head
-    const nextNode = at(removalIndex).next;
     const previousNode = at(removalIndex - 1);
+    returnVal = previousNode.next.value;
+    const nextNode = previousNode.next.next;
     //connect nodes together
     previousNode.next = nextNode;
     currentSize--;
+    return returnVal;
   };
 
   const toString = ()=> {
@@ -192,9 +201,9 @@ const makeLinkedList = (head = null, tail = null)=> {
 const linkedList1 = makeLinkedList();
 linkedList1.append( 'banana' );
 linkedList1.append( 'pear' );
-linkedList1.prepend( 'chocolate bar' );
+// linkedList1.prepend( 'chocolate bar' );
 linkedList1.append( 'cherry' );
-linkedList1.pop();
+// linkedList1.pop();
 lg( JSON.stringify( linkedList1.getHead(), null, '\t' ) ); //wow!!!
 lg( `nodes in linked list: ${ linkedList1.getSize() }` );
 // lg( `tail of linked list: ${ JSON.stringify( linkedList1.getTail(), null, '\t' ) }` );
@@ -205,5 +214,5 @@ lg( `nodes in linked list: ${ linkedList1.getSize() }` );
 // lg( `index of 'banana' in list: ${ linkedList1.findIndex('banana') }` );
 // linkedList1.insertAt('apple', 0);
 // linkedList1.insertAt('grape', 3);
-// linkedList1.removeAt(2);
+linkedList1.removeAt(2);
 lg( linkedList1.toString() );
